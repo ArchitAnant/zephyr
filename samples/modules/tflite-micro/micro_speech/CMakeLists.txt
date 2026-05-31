@@ -56,16 +56,28 @@ target_sources(
   ${OPTIONAL_TFLITE_DIR}/micro/kernels/filter_bank.cc
   ${OPTIONAL_TFLITE_DIR}/micro/kernels/pcan.cc
   ${OPTIONAL_TFLITE_DIR}/micro/kernels/filter_bank_log.cc
+  ${OPTIONAL_TFLITE_DIR}/src/filter_bank_square_root.cc
+  ${OPTIONAL_TFLITE_DIR}/src/square_root_64.cc
+  ${OPTIONAL_TFLITE_DIR}/src/square_root_32.cc
+  ${OPTIONAL_TFLITE_DIR}/src/msb_64.cc
 )
 
 if("${ARCH}" STREQUAL "xtensa")
   target_sources(
-  app
-  PRIVATE
-
-  # Xtensa kernels
-  ${OPTIONAL_TFLITE_DIR}/micro/kernels/xtensa/fft_auto_scale_kernel.cc
-  ${OPTIONAL_TFLITE_DIR}/micro/kernels/xtensa/filter_bank_square_root.cc
-  ${OPTIONAL_TFLITE_DIR}/micro/kernels/xtensa/xtensa_square_root.S
+    app
+    PRIVATE
+    # Xtensa-optimized kernels (For physical i.MX8 board)
+    ${OPTIONAL_TFLITE_DIR}/micro/kernels/xtensa/fft_auto_scale_kernel.cc
+    ${OPTIONAL_TFLITE_DIR}/micro/kernels/xtensa/filter_bank_square_root.cc
+    ${OPTIONAL_TFLITE_DIR}/micro/kernels/xtensa/xtensa_square_root.S
+  )
+else()
+  target_sources(
+    app
+    PRIVATE
+    # Generic reference kernels (For Mac/QEMU simulators)
+    # Note: TFLM usually places the generic versions in the main kernels folder
+    ${OPTIONAL_TFLITE_DIR}/micro/kernels/fft_auto_scale_kernel.cc
+    ${OPTIONAL_TFLITE_DIR}/micro/kernels/filter_bank_square_root.cc
   )
 endif()

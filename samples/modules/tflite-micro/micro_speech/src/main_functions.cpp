@@ -71,11 +71,15 @@ void app_receive_data_thread(void *arg1, void *arg2, void *arg3)
 	LOG_INF("Receiving data thread started");
 
 	k_sem_take(&data_tty_ready_sem, K_FOREVER);
+	#ifdef CONFIG_OPENAMP_VENDOR_RSC_TABLE
 	ret = rpmsg_create_ept(&tty_ept, rpdev, "audio_pcm", RPMSG_ADDR_ANY, RPMSG_ADDR_ANY, rpmsg_recv_tty_callback, NULL);
 	if (ret != 0) {
 		LOG_ERR("Could not create RPMsg endpoint");
 		return;
 	}
+	#else
+	LOG_INF("Simulation: RPMsg endpoint bypassed. Proceeding to inference loop.");
+	#endif
 
 	while (1) {
                 /* Wait for previous buffer to be fully processed */
